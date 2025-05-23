@@ -29,6 +29,6 @@ function manager.draw()
   for i,projectile in pairs(projectiles) do
     love.graphics.circle("line", projectile[2], projectile[3], 5)
   end
-s
+end
 
 return manager

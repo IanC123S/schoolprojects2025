@@ -1,14 +1,27 @@
 manager = {}
 
 function manager.create()
-  table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(5*difficulty),10,3,3,math.floor(5*difficulty)})
+  local r = math.random(1,3)
+  if r == 1 then
+    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(5*difficulty),math.random(7,10),3,3,math.floor(5*difficulty)})
+  elseif r == 2 and level > 2 then
+    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(10*difficulty),math.random(14,18),6,6,math.floor(10*difficulty)})
+  elseif r == 3 and level > 3 then
+    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(2*difficulty),math.random(4,6),2,2,math.floor(2*difficulty)})
+  else
+    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(5*difficulty),math.random(7,10),3,3,math.floor(5*difficulty)})
+  end
 end
 
-function manager.checkbullet(bx, by)
+function manager.createboss()
+  
+end
+
+function manager.checkbullet(bx, by, bulletdmg)
   for i,v in pairs(badguys) do
     if v[1]-10 < bx and bx < v[1]+10 then
         if v[2]-10 < by and by < v[2]+10 then
-          badguys[i][3] = badguys[i][3] - 5
+          badguys[i][3] = badguys[i][3] - bulletdmg
           return "hit"
         end  
       end
