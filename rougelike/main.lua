@@ -75,6 +75,8 @@ function love.draw()
   love.graphics.print("LVL: "..level, 20, 120)
 end
 
-function love.mousepressed()
-  guimanager.mousepressed()
+function love.mousepressed(...)
+  if spendingmoneys > 0 then
+    guimanager.mousepressed(...)
+  end
 end
