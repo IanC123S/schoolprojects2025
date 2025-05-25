@@ -1,27 +1,74 @@
 manager = {}
 
+-- new = x, y
+
 function manager.create()
-  local r = math.random(1,3)
-  if r == 1 then
-    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(5*difficulty),math.random(7,10),3,3,math.floor(5*difficulty)})
-  elseif r == 2 and level > 2 then
-    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(10*difficulty),math.random(14,18),6,6,math.floor(10*difficulty)})
-  elseif r == 3 and level > 3 then
-    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(2*difficulty),math.random(4,6),2,2,math.floor(2*difficulty)})
+  if math.random(1,10) == 1 then
+    table.insert(badguys,{
+      ["x"] = math.random(0,wid),
+      ["y"] = math.random(0,hei),
+      ["health"] = math.floor(25*difficulty),
+      ["maxhealth"] = math.floor(25*difficulty),
+      ["size"] = 20,
+      ["firerate"] = 1,
+      ["firecooldown"] = 1,
+      ["ai"] = "spin",
+      ["rotation"] = 0,
+      ["rotspeed"] = .025,
+      ["image"] = love.graphics.newImage("images/turret.png")
+    })
   else
-    table.insert(badguys, {math.random(0,1)*wid-20,math.random(0,hei),math.floor(5*difficulty),math.random(7,10),3,3,math.floor(5*difficulty)})
+    table.insert(badguys,{
+      ["x"] = math.random(0,1)*wid-20,
+      ["y"] = math.random(0,hei),
+      ["health"] = math.floor(5*difficulty),
+      ["maxhealth"] = math.floor(5*difficulty),
+      ["size"] = 10,
+      ["firerate"] = 3,
+      ["firecooldown"] = 3,
+      ["ai"] = "main",
+      ["image"] = love.graphics.newImage("images/enemy.png")
+    })
   end
 end
 
 function manager.createboss()
-  
+  if math.random(1,2) == 1 then
+    badguys["boss"] = {
+      ["x"] = wid/2,
+      ["y"] = hei/2,
+      ["health"] = math.floor(200*difficulty),
+      ["maxhealth"] = math.floor(200*difficulty),
+      ["size"] = 20,
+      ["firerate"] = 1,
+      ["firecooldown"] = 1,
+      ["ai"] = "main",
+      ["randomtrackingpercent"] = 20,
+      ["image"] = love.graphics.newImage("images/enemyboss.png"),
+    }
+  else
+    badguys["boss"] = {
+      ["x"] = wid/2,
+      ["y"] = hei/2,
+      ["health"] = math.floor(300*difficulty),
+      ["maxhealth"] = math.floor(300*difficulty),
+      ["size"] = 40,
+      ["firerate"] = .1,
+      ["firecooldown"] = .1,
+      ["ai"] = "spin",
+      ["rotation"] = 0,
+      ["rotspeed"] = .5,
+      ["randomtrackingpercent"] = 80,
+      ["image"] = love.graphics.newImage("images/bigboy.png"),
+    }
+  end
 end
 
 function manager.checkbullet(bx, by, bulletdmg)
   for i,v in pairs(badguys) do
-    if v[1]-10 < bx and bx < v[1]+10 then
-        if v[2]-10 < by and by < v[2]+10 then
-          badguys[i][3] = badguys[i][3] - bulletdmg
+    if v["x"]-v["size"] < bx and bx < v["x"]+v["size"] then
+        if v["y"]-v["size"] < by and by < v["y"]+v["size"] then
+          v["health"] = v["health"] - bulletdmg
           return "hit"
         end  
       end
@@ -29,26 +76,59 @@ function manager.checkbullet(bx, by, bulletdmg)
 end
 
 function manager.tick()
+  if not alive then
+    return nil
+  end
   for i,v in pairs(badguys) do
-    local xdif = playerpos["x"]-v[1]
-    local ydif = playerpos["y"]-v[2]
-    local rot = math.atan2(xdif, ydif)
-    
-    badguys[i][1] = math.sin(rot)+badguys[i][1]
-    badguys[i][2] = math.cos(rot)+badguys[i][2]
-    
-    if badguys[i][6] > 0 then
-      badguys[i][6]=badguys[i][6]-.1
-    else
-      local pdx = playerpos["x"]-v[1]
-      local pdy = playerpos["y"]-v[2]
-      local rot = math.atan2(pdx, pdy)
-  
-      projectilemanager.create("enemy", v[1], v[2], -math.sin(rot)*3, -math.cos(rot)*3, bulletdamage)
-      badguys[i][6]=badguys[i][5]
+    if v["ai"] == "main" then
+      local xdif = playerpos["x"]-v["x"]
+      local ydif = playerpos["y"]-v["y"]
+      local rot = math.atan2(xdif, ydif)
+      
+      v["x"] = math.sin(rot)+v["x"]
+      v["y"] = math.cos(rot)+v["y"]
+      
+      if v["firecooldown"] > 0 then
+        v["firecooldown"]=v["firecooldown"]-.1
+      else
+        local pdx = playerpos["x"]-v["x"]
+        local pdy = playerpos["y"]-v["y"]
+        local rot = math.atan2(pdx, pdy)
+        
+        if v["randomtrackingpercent"] and math.random(1,v["randomtrackingpercent"]) == 1 then
+          projectilemanager.create("enemy", v["x"], v["y"], -math.sin(rot)*3, -math.cos(rot)*3, bulletdamage, true)
+        else
+          projectilemanager.create("enemy", v["x"], v["y"], -math.sin(rot)*3, -math.cos(rot)*3, bulletdamage)
+        end
+        
+        if i == "boss" then
+          projectilemanager.create("enemy", v["x"], v["y"], math.sin(rot)*3, math.cos(rot)*3, bulletdamage)
+          projectilemanager.create("enemy", v["x"], v["y"], math.sin(rot-90)*3, math.cos(rot-90)*3, bulletdamage)
+          projectilemanager.create("enemy", v["x"], v["y"], math.sin(rot+90)*3, math.cos(rot+90)*3, bulletdamage)
+        end
+        
+        v["firecooldown"]=v["firerate"]
+      end
+    elseif v["ai"] == "spin" then
+      if v["firecooldown"] > 0 then
+        v["firecooldown"]=v["firecooldown"]-.1
+      else
+        if v["randomtrackingpercent"] and math.random(1,v["randomtrackingpercent"]) == 1 then
+          projectilemanager.create("enemy", v["x"], v["y"], -math.sin(v["rotation"])*3, -math.cos(v["rotation"])*3, bulletdamage, true)
+        else
+          projectilemanager.create("enemy", v["x"], v["y"], -math.sin(v["rotation"])*3, -math.cos(v["rotation"])*3, bulletdamage)
+        end
+        v["firecooldown"]=v["firerate"]
+      end
+      v["rotation"] = v["rotation"] + v["rotspeed"]
     end
-    if v[3] <= 0 then
-      exp = exp + v[7]
+    if v["health"] <= 0 then
+      exp = exp + v["maxhealth"]
+      if i == "boss" then
+        if playerhealth < 100 then
+          playerhealth = 100
+        end
+      end
       badguys[i] = nil
     end
   end
@@ -56,11 +136,23 @@ end
 
 function manager.draw()
   for i,v in pairs(badguys) do
-    local hptext = love.graphics.newText(love.graphics:getFont(), "HP: "..v[3])
-    local textw, texth = hptext:getDimensions()
-    
-    love.graphics.circle("fill", badguys[i][1], badguys[i][2], badguys[i][4])
-    love.graphics.draw(hptext, v[1]-(textw/2), v[2]-25)
+    if i == "boss" then
+      love.graphics.setColor(1,0,0)
+      local width = (v["health"]/v["maxhealth"])*(wid/2)
+      love.graphics.rectangle("fill", wid/2-width/2, 10, width, 20)
+      love.graphics.setColor(1,1,1)
+    else
+      love.graphics.setColor(1,0,0)
+      local health = v["health"]/v["maxhealth"]
+      local healthwidth = health*v["size"]*2
+      love.graphics.rectangle("fill", v["x"]-healthwidth/2, v["y"]-v["size"]-10, healthwidth, 5)
+      love.graphics.setColor(1,1,1)
+    end
+    if v["image"] then
+      love.graphics.draw(v["image"], v["x"]-v["size"], v["y"]-v["size"])
+    else
+      love.graphics.circle("fill", v["x"], v["y"], v["size"])
+    end
   end
 end
 
