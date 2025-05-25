@@ -30,20 +30,28 @@ function manager.mousepressed(mx,my,button)
     if wid-85 < mx and mx < wid-10 then
       spendingmoneys = spendingmoneys - 1
       increasestat(guioptions[3])
+      local source = love.audio.newSource("sfx/select.wav", "static")
+      love.audio.play(source)
     end
     if wid-170 < mx and mx < wid-95 then
       spendingmoneys = spendingmoneys - 1
       increasestat(guioptions[2])
+      local source = love.audio.newSource("sfx/select.wav", "static")
+      love.audio.play(source)
     end
     if wid-255 < mx and mx < wid-180 then
       spendingmoneys = spendingmoneys - 1
       increasestat(guioptions[1])
+      local source = love.audio.newSource("sfx/select.wav", "static")
+      love.audio.play(source)
     end
   end
   if not alive then
     if wid/2-75 < mx and mx < wid/2+75 and hei/3+50 < my and my < hei/3+100 then
       transitionalpha = 0
       transitionalphamodifier = 1.2
+      local source = love.audio.newSource("sfx/select.wav", "static")
+      love.audio.play(source)
     end
   end
 end
@@ -68,7 +76,15 @@ function manager.draw()
     love.graphics.setColor(255,255,0)
     love.graphics.rectangle("fill", 10, hei-55, exp/reqexp*200, 15)
     love.graphics.setColor(255,255,255)
+    
+    love.graphics.print("Score: "..score, 10, 10)
   else
+    love.graphics.setColor(0,0,0)
+    local text = love.graphics.newText(love.graphics:getFont(),"Score: "..score)
+    local tx, ty = text:getDimensions()
+    
+    love.graphics.draw(text, wid/2-tx/2, hei/3+25)
+    love.graphics.setColor(1,1,1)
     love.graphics.draw(gameover, wid/2-114, hei/8)
     love.graphics.draw(menu, wid/2-75, hei/3+50)
   end

@@ -29,8 +29,10 @@ function manager.tick()
       playerpos.y = hei
     end
   end
-  if playerhealth < 0 then
+  if playerhealth < 0 and alive then
     alive = false
+    local source = love.audio.newSource("sfx/death.wav", "static")
+    love.audio.play(source)
   end
 end
 

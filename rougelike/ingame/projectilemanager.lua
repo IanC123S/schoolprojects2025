@@ -28,6 +28,8 @@ function manager.tick()
       if playerpos.x-5 < projectile[2] and projectile[2] < playerpos.x+5 then
         if playerpos.y-5 < projectile[3] and projectile[3] < playerpos.y+5 then
           playerhealth = playerhealth - projectile[6]
+          local source = love.audio.newSource("sfx/hit.wav", "static")
+          love.audio.play(source)
           projectiles[i] = nil
         end  
       end
@@ -35,6 +37,8 @@ function manager.tick()
       local hit = enemymanager.checkbullet(projectile[2], projectile[3], projectile[6])
       if hit == "hit" then
         projectiles[i] = nil
+        local source = love.audio.newSource("sfx/enemydamage.wav", "static")
+        love.audio.play(source)
       end
     end
     if projectile[2] < 0 or wid < projectile[2] or projectile[3] < 0 or hei < projectile[3] then

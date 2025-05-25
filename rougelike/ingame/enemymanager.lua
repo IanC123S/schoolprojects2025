@@ -15,7 +15,8 @@ function manager.create()
       ["ai"] = "spin",
       ["rotation"] = 0,
       ["rotspeed"] = .025,
-      ["image"] = love.graphics.newImage("images/turret.png")
+      ["image"] = love.graphics.newImage("images/turret.png"),
+      ["score"] = 1000
     })
   else
     table.insert(badguys,{
@@ -27,7 +28,8 @@ function manager.create()
       ["firerate"] = 3,
       ["firecooldown"] = 3,
       ["ai"] = "main",
-      ["image"] = love.graphics.newImage("images/enemy.png")
+      ["image"] = love.graphics.newImage("images/enemy.png"),
+      ["score"] = 2000
     })
   end
 end
@@ -45,6 +47,7 @@ function manager.createboss()
       ["ai"] = "main",
       ["randomtrackingpercent"] = 20,
       ["image"] = love.graphics.newImage("images/enemyboss.png"),
+      ["score"] = 10000
     }
   else
     badguys["boss"] = {
@@ -60,6 +63,7 @@ function manager.createboss()
       ["rotspeed"] = .5,
       ["randomtrackingpercent"] = 80,
       ["image"] = love.graphics.newImage("images/bigboy.png"),
+      ["score"] = 10000
     }
   end
 end
@@ -124,6 +128,7 @@ function manager.tick()
     end
     if v["health"] <= 0 then
       exp = exp + v["maxhealth"]
+      score = score + v["score"]
       if i == "boss" then
         if playerhealth < 100 then
           playerhealth = 100
