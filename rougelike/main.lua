@@ -7,6 +7,8 @@ function love.load()
   
   transitionalpha = 1
   transitionalphamodifier = 0
+  
+  love.graphics.setFont(love.graphics.newFont("images/font.ttf", 25))
 end
 
 function love.update(...)

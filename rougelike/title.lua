@@ -32,6 +32,8 @@ function title.mousepressed(mx, my, button)
     transitionalpha = 0
     transitionalphamodifier = 1.2
     transitionactivated = true
+    local source = love.audio.newSource("sfx/select.wav", "static")
+    love.audio.play(source)
   end
 end
 

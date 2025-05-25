@@ -20,6 +20,8 @@ function game.load()
   exp = 0
   level = 0
   
+  score = 0
+  
   reqexp = 20
   spendingmoneys = 0
   
@@ -60,6 +62,9 @@ function game.update()
     enemymanager.create()
   end
   if exp >= reqexp then
+    local source = love.audio.newSource("sfx/levelup.wav", "static")
+    love.audio.play(source)
+    
     spendingmoneys = spendingmoneys + 1
     exp = 0
     level = level + 1
@@ -79,6 +84,9 @@ function game.update()
       local rot = math.atan2(pdx, pdy)
     
       projectilemanager.create("plr", playerpos["x"], playerpos["y"], math.sin(rot)*bulletspeed, math.cos(rot)*bulletspeed, bulletdamage)
+      
+      local source = love.audio.newSource("sfx/shoot.wav", "static")
+      love.audio.play(source)
     end 
   end
 end
